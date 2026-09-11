@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transcription YouTube</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f7f7f8;
+    --panel: #ffffff;
+    --border: #e2e2e6;
+    --text: #1c1c1f;
+    --muted: #6b6b74;
+    --accent: #c4302b;
+    --accent-hover: #a8241f;
+    --ok: #1a7f37;
+    --warn: #9a6700;
+    --err: #cf222e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17171a;
+      --panel: #202024;
+      --border: #34343a;
+      --text: #ececee;
+      --muted: #9a9aa2;
+      --ok: #3fb950;
+      --warn: #d29922;
+      --err: #f85149;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 24px 16px 60px;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  p.subtitle { color: var(--muted); margin: 0 0 24px; font-size: 0.9rem; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  input[type=text], select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  .row > div { flex: 1 1 160px; }
+  .checks { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; }
+  .checks label { display: flex; align-items: center; gap: 6px; color: var(--text); font-size: 0.85rem; margin: 0; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 0.85rem; margin-top: 10px; }
+  button {
+    margin-top: 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  button:hover { background: var(--accent-hover); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  #jobs { display: flex; flex-direction: column; gap: 14px; }
+  .job { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--panel); }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .job-url { font-size: 0.9rem; word-break: break-all; color: var(--text); }
+  .badge {
+    font-size: 0.72rem;
+    padding: 2px 9px;
+    border-radius: 999px;
+    white-space: nowrap;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge.queued, .badge.running { background: rgba(212,167,44,0.15); color: var(--warn); }
+  .badge.success { background: rgba(63,185,80,0.15); color: var(--ok); }
+  .badge.failed { background: rgba(248,81,73,0.15); color: var(--err); }
+  .logs {
+    margin-top: 10px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.78rem;
+    max-height: 150px;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .logs div { padding: 1px 0; }
+  .logs .error { color: var(--err); }
+  .logs .warning { color: var(--warn); }
+  .logs .success { color: var(--ok); }
+  .logs .step, .logs .info { color: var(--muted); }
+  .files { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .files a {
+    font-size: 0.8rem;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .files a:hover { border-color: var(--accent); }
+  .result-line { font-size: 0.85rem; margin-top: 8px; color: var(--muted); }
+  .empty { color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Transcription YouTube</h1>
+  <p class="subtitle">Colle une URL YouTube pour générer transcript.md et transcript.txt.</p>
+
+  <div class="panel">
+    <form id="job-form">
+      <label for="url">URL de la vidéo ou d'une playlist</label>
+      <input type="text" id="url" name="url" placeholder="https://www.youtube.com/watch?v=... ou .../playlist?list=..." required autocomplete="off">
+
+      <details>
+        <summary>Options avancées</summary>
+        <div class="row">
+          <div>
+            <label for="language">Langue préférée</label>
+            <select id="language">
+              <option value="auto" selected>Auto</option>
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+              <option value="es">Espagnol</option>
+              <option value="de">Allemand</option>
+            </select>
+          </div>
+          <div>
+            <label for="model">Modèle Whisper (si audio requis)</label>
+            <select id="model">
+              <option value="auto" selected>Auto (selon mémoire dispo.)</option>
+              <option value="tiny">tiny</option>
+              <option value="base">base</option>
+              <option value="small">small</option>
+              <option value="medium">medium</option>
+              <option value="large-v3">large-v3</option>
+            </select>
+          </div>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="force_whisper"> Forcer la transcription audio (ignorer les sous-titres)</label>
+          <label><input type="checkbox" id="research_mode"> Mode recherche</label>
+          <label><input type="checkbox" id="remove_filler_words"> Supprimer les mots de remplissage</label>
+        </div>
+      </details>
+
+      <button type="submit" id="submit-btn">Transcrire</button>
+    </form>
+  </div>
+
+  <div id="jobs"></div>
+  <p class="empty" id="empty-hint">Aucune transcription pour l'instant.</p>
+</main>
+
+<script>
+(function () {
+  const form = document.getElementById("job-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const jobsEl = document.getElementById("jobs");
+  const emptyHint = document.getElementById("empty-hint");
+  const activePolls = new Set();
+
+  const STATUS_LABELS = { queued: "En attente", running: "En cours", success: "Terminé", failed: "Échec" };
+  const FILE_LABELS = {
+    "transcript.md": "transcript.md",
+    "transcript.txt": "transcript.txt",
+    "metadata.json": "metadata.json",
+    "processing_report.json": "processing_report.json",
+    "chapters.json": "chapters.json",
+    "raw_transcript.json": "raw_transcript.json",
+  };
+
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function createJobCard(jobId, url) {
+    const card = el("div", "job");
+    card.id = "job-" + jobId;
+
+    const head = el("div", "job-head");
+    head.appendChild(el("div", "job-url", url));
+    const badge = el("span", "badge queued", STATUS_LABELS.queued);
+    badge.dataset.role = "badge";
+    head.appendChild(badge);
+    card.appendChild(head);
+
+    const logs = el("div", "logs");
+    logs.dataset.role = "logs";
+    card.appendChild(logs);
+
+    const resultLine = el("div", "result-line");
+    resultLine.dataset.role = "result";
+    resultLine.hidden = true;
+    card.appendChild(resultLine);
+
+    const files = el("div", "files");
+    files.dataset.role = "files";
+    card.appendChild(files);
+
+    jobsEl.insertBefore(card, jobsEl.firstChild);
+    emptyHint.hidden = true;
+    return card;
+  }
+
+  function updateJobCard(jobId, data) {
+    const card = document.getElementById("job-" + jobId);
+    if (!card) return;
+
+    const badge = card.querySelector('[data-role="badge"]');
+    badge.className = "badge " + data.status;
+    badge.textContent = STATUS_LABELS[data.status] || data.status;
+
+    const logsEl = card.querySelector('[data-role="logs"]');
+    logsEl.innerHTML = "";
+    (data.logs || []).forEach(function (entry) {
+      logsEl.appendChild(el("div", entry.level, entry.message));
+    });
+    logsEl.scrollTop = logsEl.scrollHeight;
+
+    if (data.status === "success" && data.outcome) {
+      const resultLine = card.querySelector('[data-role="result"]');
+      resultLine.hidden = false;
+      resultLine.textContent =
+        "Qualité : " + (data.outcome.quality || "?") + "  ·  Source : " + (data.outcome.source || "?");
+
+      const filesEl = card.querySelector('[data-role="files"]');
+      filesEl.innerHTML = "";
+      (data.files || []).forEach(function (name) {
+        const link = el("a", null, FILE_LABELS[name] || name);
+        link.href = "/api/jobs/" + jobId + "/file/" + encodeURIComponent(name);
+        link.target = "_blank";
+        link.rel = "noopener";
+        filesEl.appendChild(link);
+      });
+    }
+  }
+
+  function pollJob(jobId) {
+    if (activePolls.has(jobId)) return;
+    activePolls.add(jobId);
+
+    const timer = setInterval(function () {
+      fetch("/api/jobs/" + jobId)
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          updateJobCard(jobId, data);
+          if (data.status === "success" || data.status === "failed") {
+            clearInterval(timer);
+            activePolls.delete(jobId);
+          }
+        })
+        .catch(function () {
+          clearInterval(timer);
+          activePolls.delete(jobId);
+        });
+    }, 1200);
+  }
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    const url = document.getElementById("url").value.trim();
+    if (!url) return;
+
+    submitBtn.disabled = true;
+
+    const payload = {
+      url: url,
+      language: document.getElementById("language").value,
+      model: document.getElementById("model").value,
+      force_whisper: document.getElementById("force_whisper").checked,
+      research_mode: document.getElementById("research_mode").checked,
+      remove_filler_words: document.getElementById("remove_filler_words").checked,
+    };
+
+    fetch("/api/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        if (!result.ok) {
+          alert(result.data.error || "Erreur lors de la création de la tâche.");
+          return;
+        }
+        (result.data.jobs || []).forEach(function (job) {
+          createJobCard(job.id, job.url);
+          pollJob(job.id);
+        });
+        document.getElementById("url").value = "";
+      })
+      .catch(function () {
+        alert("Impossible de contacter le serveur.");
+      })
+      .finally(function () {
+        submitBtn.disabled = false;
+      });
+  });
+})();
+</script>
+</body>
+</html>

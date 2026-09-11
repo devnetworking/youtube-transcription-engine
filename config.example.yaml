@@ -1,0 +1,11 @@
+output_dir: output
+language: auto
+prefer_captions: true
+whisper_model: auto
+timestamps: true
+chapter_detection: true
+generate_summary: true
+generate_txt: true
+generate_markdown: true
+generate_metadata: true
+diarize: false
