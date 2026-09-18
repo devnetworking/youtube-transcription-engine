@@ -1,0 +1,35 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'jobs' %}
+{% block title %}Jobs · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>Jobs</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Jobs</h1>
+  <p>Every conversion, merge and split, with live progress from the backend.</p>
+</div>
+
+<div class="flex gap-12 wrap" style="margin-bottom:16px;">
+  <select id="filter-status" style="max-width:160px;">
+    <option value="">All statuses</option>
+    <option value="queued">Queued</option>
+    <option value="processing">Processing</option>
+    <option value="completed">Completed</option>
+    <option value="failed">Failed</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+  <select id="filter-operation" style="max-width:180px;">
+    <option value="">All types</option>
+    <option value="pdf_to_markdown">PDF &rarr; Markdown</option>
+    <option value="merge">Merge</option>
+    <option value="split">Split</option>
+    <option value="youtube_transcript">YouTube Transcript</option>
+  </select>
+</div>
+
+<div class="panel">
+  <div id="jobs-table"><div class="skeleton" style="height:200px;border-radius:10px;"></div></div>
+</div>
+
+<div id="drawer-root"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/jobs.js"></script>{% endblock %}

@@ -39,6 +39,12 @@
     padding: 24px 16px 60px;
   }
   main { max-width: 760px; margin: 0 auto; }
+  nav.top-nav { max-width: 760px; margin: 0 auto 18px; display: flex; justify-content: flex-end; }
+  nav.top-nav a {
+    font-size: 0.82rem; color: var(--muted); text-decoration: none;
+    border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px;
+  }
+  nav.top-nav a:hover { color: var(--text); border-color: var(--accent); }
   h1 { font-size: 1.5rem; margin: 0 0 4px; }
   p.subtitle { color: var(--muted); margin: 0 0 24px; font-size: 0.9rem; }
   .panel {
@@ -121,6 +127,7 @@
 </style>
 </head>
 <body>
+<nav class="top-nav"><a href="/documents">Documents &rarr;</a></nav>
 <main>
   <h1>Transcription YouTube</h1>
   <p class="subtitle">Colle une URL YouTube pour générer transcript.md et transcript.txt.</p>

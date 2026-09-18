@@ -14,3 +14,16 @@ flask>=3.0
 # if audio transcription is actually needed and these are absent.
 faster-whisper>=1.0.0
 psutil>=5.9
+
+# Documents module: PDF -> Markdown, merge, split (see README.md,
+# section "Document Processing"). PyMuPDF is used under the AGPL-3.0
+# license.
+pymupdf>=1.24
+
+# Optional local OCR fallback for scanned PDFs. Works without these
+# installed as long as OCR is not actually needed (documents already
+# have a text layer); a clear error explains what's missing otherwise.
+# Also requires the Tesseract binary on PATH (not a Python package):
+#   winget install --id UB-Mannheim.TesseractOCR
+pytesseract>=0.3.10
+pillow>=10.0

@@ -26,8 +26,20 @@ def client(monkeypatch, tmp_path):
     return app.test_client()
 
 
-def test_index_page_loads(client):
+def test_index_page_is_the_documents_dashboard(client):
     resp = client.get("/")
+    assert resp.status_code == 200
+    assert b"Documents" in resp.data
+
+
+def test_documents_alias_redirects_to_root(client):
+    resp = client.get("/documents")
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/"
+
+
+def test_legacy_transcribe_page_still_works(client):
+    resp = client.get("/legacy/transcribe")
     assert resp.status_code == 200
     assert b"Transcrire" in resp.data or b"url" in resp.data.lower()
 

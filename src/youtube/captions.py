@@ -15,6 +15,29 @@ from ..exceptions import CaptionsUnavailableError, VideoUnavailableError
 from ..models import TranscriptionResult, TranscriptionSource, TranscriptSegment
 
 
+def list_available_languages(video_id: str) -> list[dict]:
+    """List the caption tracks YouTube actually publishes for this video
+    (section 16: never offer a language that isn't really there).
+    Returns [] if captions are disabled/unavailable - that's a normal,
+    expected outcome here (unlike get_captions, this never raises for
+    "no captions", since it's used for a preview, not a transcription
+    attempt)."""
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
+    except ImportError:
+        return []
+
+    try:
+        transcript_list = YouTubeTranscriptApi().list(video_id)
+    except Exception:  # noqa: BLE001 - any failure here just means "no languages to show"
+        return []
+
+    return [
+        {"code": t.language_code, "name": t.language, "is_generated": t.is_generated}
+        for t in transcript_list
+    ]
+
+
 def get_captions(video_id: str, preferred_language: Optional[str] = None) -> TranscriptionResult:
     try:
         from youtube_transcript_api import YouTubeTranscriptApi

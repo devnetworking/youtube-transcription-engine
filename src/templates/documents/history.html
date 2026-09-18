@@ -1,0 +1,30 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'history' %}
+{% block title %}History · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>History</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>History</h1>
+  <p>A complete record of every conversion, merge and split.</p>
+</div>
+
+<div class="flex gap-12 wrap" style="margin-bottom:16px;">
+  <input type="search" id="search-input" placeholder="Search by file name..." style="max-width:280px;">
+  <select id="filter-operation" style="max-width:180px;">
+    <option value="">All operations</option>
+    <option value="pdf_to_markdown">Convert &rarr; Markdown</option>
+    <option value="merge">Merge</option>
+    <option value="split">Split</option>
+    <option value="youtube_transcript">YouTube Transcript</option>
+  </select>
+  <select id="filter-status" style="max-width:160px;">
+    <option value="">All statuses</option>
+    <option value="completed">Completed</option>
+    <option value="failed">Failed</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+</div>
+
+<div class="panel"><div id="history-table"><div class="skeleton" style="height:240px;border-radius:10px;"></div></div></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/history.js"></script>{% endblock %}

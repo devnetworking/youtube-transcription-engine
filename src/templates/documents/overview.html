@@ -1,0 +1,68 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'overview' %}
+{% block title %}Document Intelligence{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="flex between wrap" style="gap:16px;">
+    <div>
+      <h1>Documents</h1>
+      <p>Process, convert and organize your documents and content.</p>
+    </div>
+    <div class="actions" style="margin-top:0;">
+      <a class="btn primary" href="/documents/pdf-to-markdown"><span data-icon="upload"></span> Upload</a>
+    </div>
+  </div>
+</div>
+
+<div class="stat-grid" id="stat-grid">
+  <div class="stat-tile"><div class="value skeleton" style="height:1.5rem;width:40px;">&nbsp;</div><div class="label">Documents</div></div>
+  <div class="stat-tile"><div class="value skeleton" style="height:1.5rem;width:40px;">&nbsp;</div><div class="label">Transcripts</div></div>
+  <div class="stat-tile"><div class="value skeleton" style="height:1.5rem;width:40px;">&nbsp;</div><div class="label">Jobs processed</div></div>
+  <div class="stat-tile"><div class="value skeleton" style="height:1.5rem;width:40px;">&nbsp;</div><div class="label">Storage used</div></div>
+</div>
+
+<div class="panel" style="margin-bottom:24px;">
+  <h2 style="margin:0 0 4px;font-size:1.05rem;">Start a new task</h2>
+  <p class="muted" style="margin:0 0 16px;font-size:0.86rem;">Pick an action to get started - options and previews come after.</p>
+  <div class="card-grid">
+    <a class="action-card" href="/documents/pdf-to-markdown">
+      <div class="icon-badge" data-icon="markdown"></div>
+      <h3>PDF &rarr; Markdown</h3>
+      <p>Convert PDF documents into clean and structured Markdown.</p>
+      <span class="cta">Convert PDF &rarr;</span>
+    </a>
+    <a class="action-card" href="/documents/merge">
+      <div class="icon-badge" data-icon="merge"></div>
+      <h3>Merge PDFs</h3>
+      <p>Combine multiple PDF files into a single document.</p>
+      <span class="cta">Merge PDFs &rarr;</span>
+    </a>
+    <a class="action-card" href="/documents/split">
+      <div class="icon-badge" data-icon="split"></div>
+      <h3>Split PDF</h3>
+      <p>Extract pages or divide a document into multiple PDF files.</p>
+      <span class="cta">Split PDF &rarr;</span>
+    </a>
+    <a class="action-card" href="/documents/youtube-transcript">
+      <div class="icon-badge" data-icon="youtube"></div>
+      <h3>YouTube Transcript</h3>
+      <p>Extract and structure transcripts from YouTube videos.</p>
+      <span class="cta">Create Transcript &rarr;</span>
+    </a>
+  </div>
+</div>
+
+<div class="panel" style="margin-bottom:24px;">
+  <h2 style="margin:0 0 14px;font-size:1.05rem;">Recent activity</h2>
+  <div id="recent-activity"><div class="skeleton" style="height:100px;border-radius:10px;"></div></div>
+</div>
+
+<div class="panel">
+  <div class="flex between center" style="margin-bottom:14px;">
+    <h2 style="margin:0;font-size:1.05rem;">Recent files</h2>
+    <a href="/documents/files" class="btn ghost small">View all</a>
+  </div>
+  <div id="recent-documents"><div class="skeleton" style="height:120px;border-radius:10px;"></div></div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/overview.js"></script>{% endblock %}

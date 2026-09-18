@@ -1,0 +1,12 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'settings' %}
+{% block title %}Settings · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>Settings</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+  <p>Current configuration of the document engine. Change it via <code>config.yaml</code> (a <code>documents:</code> section) or <code>DOCS_*</code> environment variables, then restart the server - see README.md.</p>
+</div>
+<div id="settings-content"><div class="skeleton" style="height:320px;border-radius:10px;"></div></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/settings.js"></script>{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'youtube-transcript' %}
+{% block title %}YouTube Transcript · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>YouTube Transcript</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>YouTube Transcript</h1>
+  <p>Extract, structure and export transcripts from YouTube videos.</p>
+</div>
+
+<div class="panel" id="url-panel" style="margin-bottom:20px;">
+  <label class="field-label" for="youtube-url">Enter a YouTube URL</label>
+  <div class="flex gap-8" style="align-items:flex-start;">
+    <input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=... or youtu.be/...">
+    <button class="btn primary" id="get-transcript-btn" style="flex:none;">Get Transcript</button>
+  </div>
+  <div class="field-error hidden" id="url-error"></div>
+</div>
+
+<div class="panel hidden" id="preview-panel" style="margin-bottom:20px;"></div>
+
+<div class="panel hidden" id="options-panel-wrap" style="margin-bottom:20px;">
+  <details class="options-panel" open>
+    <summary>Options</summary>
+    <div class="options-grid">
+      <div class="options-group">
+        <h4>Language</h4>
+        <label class="field-label" for="opt-language">Transcript language</label>
+        <select id="opt-language"><option value="auto">Auto detect</option></select>
+      </div>
+      <div class="options-group">
+        <h4>Transcription</h4>
+        <label class="checkbox-row"><input type="checkbox" id="opt-force-whisper"> Force audio transcription (ignore captions)</label>
+        <label class="field-label" for="opt-model" style="margin-top:8px;">Whisper model (if audio is needed)</label>
+        <select id="opt-model">
+          <option value="auto" selected>Auto (by available memory)</option>
+          <option value="tiny">tiny</option>
+          <option value="base">base</option>
+          <option value="small">small</option>
+          <option value="medium">medium</option>
+          <option value="large-v3">large-v3</option>
+        </select>
+      </div>
+      <div class="options-group">
+        <h4>Structure</h4>
+        <label class="checkbox-row"><input type="checkbox" id="opt-timestamps" checked> Include timestamps</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-chapters" checked> Detect chapters</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-summary" checked> Generate executive summary</label>
+      </div>
+      <div class="options-group">
+        <h4>Advanced</h4>
+        <label class="checkbox-row"><input type="checkbox" id="opt-research"> Research mode</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-filler"> Remove filler words</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-txt" checked> Generate .txt</label>
+        <label class="checkbox-row"><input type="checkbox" id="opt-metadata" checked> Generate metadata.json</label>
+      </div>
+    </div>
+  </details>
+  <button class="btn primary" id="generate-btn" style="margin-top:6px;">Generate Transcript</button>
+</div>
+
+<div id="jobs-list"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/youtube_transcript.js"></script>{% endblock %}

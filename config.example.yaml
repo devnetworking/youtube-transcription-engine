@@ -9,3 +9,20 @@ generate_txt: true
 generate_markdown: true
 generate_metadata: true
 diarize: false
+
+# Document Processing module (PDF -> Markdown, merge, split). Optional -
+# omit this whole section to keep the defaults in src/documents/config.py.
+documents:
+  data_dir: documents_data
+  max_upload_size_mb: 512
+  max_pages_per_document: 20000
+  max_files_per_merge: 50
+  max_concurrent_jobs: 2
+  job_timeout_seconds: 1800
+  temp_file_retention_hours: 24
+  output_retention_days: 30
+  default_ocr_mode: auto
+  default_extract_images: true
+  default_detect_tables: true
+  ocr_language: auto
+  allowed_upload_extensions: [pdf]

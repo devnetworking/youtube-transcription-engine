@@ -1,0 +1,82 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'split' %}
+{% block title %}Split PDF · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>Split PDF</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Split PDF</h1>
+  <p>Break a PDF into page ranges, fixed-size parts, a custom page set, or one file per page.</p>
+</div>
+
+<div class="panel" id="upload-panel" style="margin-bottom:20px;">
+  <div id="dropzone" class="dropzone">
+    <div class="glyph" data-icon="upload"></div>
+    <h3>Choose a PDF to split</h3>
+    <p>Drag &amp; drop, or click to browse</p>
+    <input type="file" id="file-input" accept="application/pdf">
+  </div>
+</div>
+
+<div class="panel hidden" id="split-panel" style="margin-bottom:20px;">
+  <div class="flex between center" style="margin-bottom:16px;">
+    <div class="flex center gap-12">
+      <div class="thumb" style="width:34px;height:44px;border:1px solid var(--border);border-radius:4px;overflow:hidden;" id="doc-thumb"></div>
+      <div>
+        <div id="doc-name" style="font-weight:550;font-size:0.92rem;"></div>
+        <div id="doc-meta" class="muted" style="font-size:0.8rem;"></div>
+      </div>
+    </div>
+    <button class="btn ghost small" id="change-doc-btn">Change file</button>
+  </div>
+
+  <div class="tabs" id="mode-tabs">
+    <button data-mode="ranges" class="active">Page ranges</button>
+    <button data-mode="every_n_pages">Every N pages</button>
+    <button data-mode="extract_pages">Extract pages</button>
+    <button data-mode="every_page">One PDF per page</button>
+    <button data-mode="visual">Visual selection</button>
+  </div>
+
+  <div id="mode-ranges" class="mode-panel">
+    <label class="field-label">One range per line - each line becomes a separate file</label>
+    <textarea id="ranges-input" placeholder="1-10&#10;11-30&#10;31-50"></textarea>
+    <div class="field-hint">Accepts "1", "1-5", or "1-5,8" per line.</div>
+  </div>
+
+  <div id="mode-every_n_pages" class="mode-panel hidden">
+    <label class="field-label">Pages per file</label>
+    <input type="number" id="every-n-input" min="1" value="10" style="max-width:140px;">
+  </div>
+
+  <div id="mode-extract_pages" class="mode-panel hidden">
+    <label class="field-label">Pages to extract into a single file</label>
+    <input type="text" id="extract-input" placeholder="1,3,4,8,10-20">
+    <div class="field-hint">Comma-separated pages and/or ranges.</div>
+  </div>
+
+  <div id="mode-every_page" class="mode-panel hidden">
+    <p class="muted" style="font-size:0.86rem;">Every page becomes its own PDF file, delivered as a ZIP.</p>
+  </div>
+
+  <div id="mode-visual" class="mode-panel hidden">
+    <p class="muted" style="font-size:0.84rem;margin-bottom:10px;">Click pages to select them - they'll be extracted into one file.</p>
+    <div class="thumb-grid" id="thumb-grid"></div>
+    <div class="thumb-pager">
+      <button class="btn ghost small" id="thumb-prev">&larr; Previous</button>
+      <span id="thumb-range"></span>
+      <button class="btn ghost small" id="thumb-next">Next &rarr;</button>
+    </div>
+  </div>
+
+  <div class="field" style="margin-top:18px;max-width:420px;" id="naming-field">
+    <label class="field-label" for="naming-pattern">File naming pattern</label>
+    <input type="text" id="naming-pattern" value="{original_name}_part-{index}_pages-{start_page}-{end_page}">
+    <div class="field-hint" id="naming-preview"></div>
+  </div>
+
+  <button class="btn primary" id="split-btn" style="margin-top:8px;">Split PDF</button>
+</div>
+
+<div id="jobs-list"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/split.js"></script>{% endblock %}

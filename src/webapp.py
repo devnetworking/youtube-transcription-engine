@@ -19,9 +19,11 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
-from flask import Flask, jsonify, render_template, request, send_from_directory
+from flask import Flask, jsonify, redirect, render_template, request, send_from_directory
 
 from .config import AppConfig
+from .documents.config import DocumentSettings, load_document_settings
+from .documents.routes import create_documents_blueprint, create_documents_pages_blueprint
 from .pipeline import process_video, resolve_urls
 
 ALLOWED_FILES = [
@@ -80,13 +82,45 @@ def _run_job(job_id: str, url: str, config: AppConfig, output_root: Path) -> Non
             job["video_dir_name"] = Path(outcome.video_dir).name
 
 
-def create_app(output_root: Path, defaults: Optional[AppConfig] = None) -> Flask:
+def create_app(
+    output_root: Path,
+    defaults: Optional[AppConfig] = None,
+    documents_root: Optional[Path] = None,
+    documents_settings: Optional[DocumentSettings] = None,
+) -> Flask:
     app = Flask(__name__)
     output_root.mkdir(parents=True, exist_ok=True)
     base_config = defaults or AppConfig()
 
+    doc_settings = documents_settings or load_document_settings()
+    doc_root = documents_root or (output_root / ".documents")
+    doc_root.mkdir(parents=True, exist_ok=True)
+    # A generous ceiling on the whole request body (a batch of several
+    # PDFs), on top of the per-file limit already enforced while
+    # streaming to disk (documents/storage.py) - this just rejects an
+    # absurd request before it's even parsed.
+    app.config["MAX_CONTENT_LENGTH"] = doc_settings.max_upload_size_mb * 1024 * 1024 * doc_settings.max_files_per_merge
+    app.register_blueprint(create_documents_blueprint(doc_root, doc_settings))
+    app.register_blueprint(create_documents_pages_blueprint())
+
     @app.get("/")
     def index():
+        # The Documents dashboard is the platform's home page (no
+        # redirect chain in the common case - see the "/documents"
+        # alias below for anyone who types the old URL directly).
+        return render_template("documents/overview.html")
+
+    @app.get("/documents")
+    def documents_home_alias():
+        return redirect("/")
+
+    @app.get("/legacy/transcribe")
+    def legacy_transcribe():
+        # The simple, single-page YouTube form this project shipped with
+        # before it became part of the Documents workspace. Kept reachable
+        # (not deleted) so nothing that worked before stops working, even
+        # though /documents/youtube-transcript is now the primary, fully
+        # integrated way to do the same thing.
         return render_template("index.html")
 
     @app.post("/api/jobs")
@@ -168,9 +202,11 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1", help="Bind address (default: 127.0.0.1, local-only).")
     parser.add_argument("--port", type=int, default=8000, help="Port to listen on (default: 8000).")
     parser.add_argument("--output", type=Path, default=Path("output"), help="Output directory root.")
+    parser.add_argument("--config", type=Path, default=None, help="YAML config file (transcription + documents settings).")
+    parser.add_argument("--documents-dir", type=Path, default=None, help="Storage directory for the Documents module (default: <output>/.documents).")
     args = parser.parse_args()
 
-    app = create_app(args.output)
+    app = create_app(args.output, documents_root=args.documents_dir, documents_settings=load_document_settings(args.config))
     print(f"Serving on http://{args.host}:{args.port}  (Ctrl+C to stop)")
     app.run(host=args.host, port=args.port, threaded=True)
 

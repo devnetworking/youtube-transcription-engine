@@ -1,0 +1,31 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'merge' %}
+{% block title %}Merge PDFs · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>Merge PDF</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Merge PDFs</h1>
+  <p>Combine several PDFs into one file, in any order. Optionally select only some pages from each file.</p>
+</div>
+
+<div class="panel" style="margin-bottom:20px;">
+  <div id="dropzone" class="dropzone">
+    <div class="glyph" data-icon="upload"></div>
+    <h3>Add PDFs to merge</h3>
+    <p>Drag &amp; drop, or click to browse - order them below once added</p>
+    <input type="file" id="file-input" accept="application/pdf" multiple>
+  </div>
+
+  <div id="merge-list" style="margin-top:16px;"></div>
+
+  <div class="field" style="margin-top:18px;max-width:360px;">
+    <label class="field-label" for="output-name">Output file name</label>
+    <input type="text" id="output-name" placeholder="merged-document.pdf">
+  </div>
+
+  <button class="btn primary" id="merge-btn" disabled>Merge PDFs</button>
+</div>
+
+<div id="jobs-list"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/merge.js"></script>{% endblock %}

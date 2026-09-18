@@ -1,0 +1,31 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'files' %}
+{% block title %}Files · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><span>Files</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Files</h1>
+  <p>Every document you've uploaded, with its conversions, merges and splits.</p>
+  <div class="actions"><a class="btn primary" href="/documents/pdf-to-markdown">{{ '' }}Upload PDF</a></div>
+</div>
+
+<div class="flex between center wrap gap-12" style="margin-bottom:16px;">
+  <input type="search" id="search-input" placeholder="Search documents..." style="max-width:320px;">
+  <div class="flex gap-8">
+    <button class="icon-btn" id="view-list" title="List view" data-icon="list"></button>
+    <button class="icon-btn" id="view-grid" title="Grid view" data-icon="grid"></button>
+  </div>
+</div>
+
+<div class="panel hidden flex between center" id="bulk-bar" style="margin-bottom:14px;">
+  <span id="bulk-count" class="muted" style="font-size:0.85rem;"></span>
+  <div class="flex gap-8">
+    <button class="btn ghost small" id="bulk-download">Download</button>
+    <button class="btn danger small" id="bulk-delete">Delete</button>
+  </div>
+</div>
+
+<div class="panel" id="files-container"><div class="skeleton" style="height:240px;border-radius:10px;"></div></div>
+<div id="menu-root"></div>
+{% endblock %}
+{% block scripts %}<script src="/static/documents/js/files.js"></script>{% endblock %}

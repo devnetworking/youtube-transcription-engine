@@ -1,0 +1,31 @@
+{% extends "documents/_layout.html" %}
+{% set active = 'files' %}
+{% block title %}File details · Document Intelligence{% endblock %}
+{% block breadcrumb %}<a href="/">Documents</a><span class="sep">/</span><a href="/documents/files">Files</a><span class="sep">/</span><span id="crumb-name">...</span>{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="flex between wrap" style="gap:16px;">
+    <div>
+      <h1 id="doc-title">Loading...</h1>
+      <p id="doc-subtitle"></p>
+    </div>
+    <div class="actions" id="doc-actions" style="margin-top:0;"></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button data-tab="preview" class="active">Preview</button>
+  <button data-tab="details">File information</button>
+  <button data-tab="derived">Derived files</button>
+  <button data-tab="history">History</button>
+</div>
+
+<div id="tab-preview" class="tab-panel"><div class="skeleton" style="height:400px;border-radius:10px;"></div></div>
+<div id="tab-details" class="tab-panel hidden panel"></div>
+<div id="tab-derived" class="tab-panel hidden panel"></div>
+<div id="tab-history" class="tab-panel hidden panel"></div>
+{% endblock %}
+{% block scripts %}
+<script>window.__DOCUMENT_ID__ = {{ document_id | tojson }};</script>
+<script src="/static/documents/js/file_detail.js"></script>
+{% endblock %}
