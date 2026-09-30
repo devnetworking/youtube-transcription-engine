@@ -421,6 +421,8 @@ def analyze_document(
     furniture_texts, numeric_zones = _detect_furniture(sampled_layouts, body_size)
 
     for page_index in range(page_count):
+        if page_index > 0 and page_index % 500 == 0:
+            pdf.shrink_cache()
         layout = pdf.get_page_layout(page_index)
 
         if layout.char_count == 0 and ocr_page_text is not None:

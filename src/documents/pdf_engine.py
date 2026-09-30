@@ -212,6 +212,16 @@ class PDFDocument:
             images.append(ImageData(data=base["image"], ext=base["ext"], bbox=bbox))
         return images
 
+    def shrink_cache(self) -> None:
+        """Release PyMuPDF's internal object store (fonts, images,
+        glyphs) accumulated while walking a document page by page.
+        Without this, a document with tens of thousands of pages can
+        grow the process's memory footprint page after page even
+        though each individual page is unremarkable - the caller
+        invokes this periodically (not every page: it has a real cost)
+        during a long walk, never after just a handful of pages."""
+        fitz.TOOLS.store_shrink(100)
+
     def render_thumbnail(self, page_index: int, max_dim: int = 320) -> bytes:
         page = self._doc[page_index]
         rect = page.rect
@@ -219,11 +229,27 @@ class PDFDocument:
         pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale))
         return pix.tobytes("png")
 
-    def render_page_image(self, page_index: int, dpi: int = 300) -> bytes:
+    def render_page_image(self, page_index: int, dpi: int = 300, max_dim: int = 6000) -> bytes:
         """Higher-resolution render used as OCR input, where thumbnail
-        resolution would hurt recognition accuracy."""
+        resolution would hurt recognition accuracy.
+
+        `dpi` alone is unbounded: a page with an unusually large physical
+        size (a poster, an architectural drawing, a corrupt/adversarial
+        MediaBox) rendered at 300 DPI can demand gigabytes for a single
+        pixmap, which crashes the whole process - not something a Python
+        `except` can catch, since it's a native allocation failure/OOM,
+        not a Python exception (section 5, 31). `max_dim` caps the
+        longest output side regardless of `dpi`, scaling the effective
+        resolution down for that one oversized page instead of crashing;
+        every normal page is far below this ceiling and renders at the
+        full requested DPI exactly as before.
+        """
         page = self._doc[page_index]
         scale = dpi / 72
+        rect = page.rect
+        longest_side = max(rect.width, rect.height, 1) * scale
+        if longest_side > max_dim:
+            scale *= max_dim / longest_side
         pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale))
         return pix.tobytes("png")
 
